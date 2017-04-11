@@ -630,9 +630,11 @@ int beepon = 0;
 #define MOTOR_BEEPS_PWM_ON 0.2
 #define MOTOR_BEEPS_PWM_OFF 0.0
 
+extern char aux[AUXNUMBER];
+
 void motorbeep( void)
 {
-	if (failsafe)
+	if (failsafe && aux[BEEP_MOTOR_BUTTON])
 	{
 		unsigned long time = gettime();
 		if (!motorbeeptime)

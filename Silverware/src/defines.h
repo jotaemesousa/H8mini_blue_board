@@ -1,6 +1,6 @@
 
 // defines for things that do not normally need changing
-
+// Use Multipro on bayang protocol (TGY-i6S)
 
 #define MOTOR_BL 0
 #define MOTOR_FL 1
@@ -36,12 +36,15 @@
 
 #define CH_ON (AUXNUMBER - 2)
 #define CH_OFF (AUXNUMBER - 1)
+
+
 #define CH_FLIP 0
 #define CH_EXPERT 1
 #define CH_HEADFREE 2
 #define CH_RTH 3
 #define CH_AUX1 4
 #define CH_AUX2 5
+
 // trims numbers have to be sequential, atart at CH_PIT_TRIM
 #define CH_PIT_TRIM 6
 #define CH_RLL_TRIM 7

@@ -46,70 +46,70 @@ extern float rx[];
 int gestures2()
 {
 	if (onground)
-	  {
-		  if (GMACRO_XCENTER && GMACRO_PITCHCENTER)
-		    {
-			    gesture_start = GESTURE_CENTER;
-		    }
-		  else if (GMACRO_LEFT && GMACRO_PITCHCENTER)
-		    {
-			    gesture_start = GESTURE_LEFT;
-		    }
-		  else if (GMACRO_RIGHT && GMACRO_PITCHCENTER)
-		    {
-			    gesture_start = GESTURE_RIGHT;
-		    }
-		  else if (GMACRO_DOWN && GMACRO_XCENTER)
-		    {
-			    gesture_start = GESTURE_DOWN;
-		    }
-		  else if (GMACRO_UP && GMACRO_XCENTER)
-		    {
-			    gesture_start = GESTURE_UP;
-		    }
-		  else
-		    {
-			    //      gesture_start = GESTURE_OTHER;  
-		    }
+	{
+		if (GMACRO_XCENTER && GMACRO_PITCHCENTER)
+		{
+			gesture_start = GESTURE_CENTER;
+		}
+		else if (GMACRO_LEFT && GMACRO_PITCHCENTER)
+		{
+			gesture_start = GESTURE_LEFT;
+		}
+		else if (GMACRO_RIGHT && GMACRO_PITCHCENTER)
+		{
+			gesture_start = GESTURE_RIGHT;
+		}
+		else if (GMACRO_DOWN && GMACRO_XCENTER)
+		{
+			gesture_start = GESTURE_DOWN;
+		}
+		else if (GMACRO_UP && GMACRO_XCENTER)
+		{
+			gesture_start = GESTURE_UP;
+		}
+		else
+		{
+			//      gesture_start = GESTURE_OTHER;
+		}
 
-		  unsigned long time = gettime();
+		unsigned long time = gettime();
 
-		  if (gesture_start != lastgesture)
-		    {
-			    gesturetime = time;
-		    }
-
-
-		  if (time - gesturetime > GESTURETIME_MIN)
-		    {
-			    if ((gesture_start == GESTURE_CENTER) && (time - gesturetime > GESTURETIME_IDLE))
-			      {
-				      setgesture = GESTURE_CENTER_IDLE;
-			      }
-			    else if (time - gesturetime > GESTURETIME_MAX)
-			      {
-				      if ((gesture_start != GESTURE_OTHER))
-					      setgesture = GESTURE_LONG;
-			      }
-
-			    else
-				    setgesture = gesture_start;
-
-		    }
+		if (gesture_start != lastgesture)
+		{
+			gesturetime = time;
+		}
 
 
-		  lastgesture = gesture_start;
+		if (time - gesturetime > GESTURETIME_MIN)
+		{
+			if ((gesture_start == GESTURE_CENTER) && (time - gesturetime > GESTURETIME_IDLE))
+			{
+				setgesture = GESTURE_CENTER_IDLE;
+			}
+			else if (time - gesturetime > GESTURETIME_MAX)
+			{
+				if ((gesture_start != GESTURE_OTHER))
+					setgesture = GESTURE_LONG;
+			}
+
+			else
+				setgesture = gesture_start;
+
+		}
+
+
+		lastgesture = gesture_start;
 
 
 
-		  return gesture_sequence(setgesture);
+		return gesture_sequence(setgesture);
 
-	  }
+	}
 	else
-	  {
-		  setgesture = GESTURE_OTHER;
-		  lastgesture = GESTURE_OTHER;
-	  }
+	{
+		setgesture = GESTURE_OTHER;
+		lastgesture = GESTURE_OTHER;
+	}
 
 	return 0;
 }
@@ -121,76 +121,76 @@ uint8_t gbuffer[GSIZE];
 
 // L L D
 const uint8_t command1[GSIZE] = {
-	GESTURE_CENTER_IDLE, GESTURE_LEFT, GESTURE_CENTER, GESTURE_LEFT, GESTURE_CENTER, GESTURE_DOWN, GESTURE_CENTER
+		GESTURE_CENTER_IDLE, GESTURE_LEFT, GESTURE_CENTER, GESTURE_LEFT, GESTURE_CENTER, GESTURE_DOWN, GESTURE_CENTER
 };
 
 // R R D
 const uint8_t command2[GSIZE] = {
-	GESTURE_CENTER_IDLE, GESTURE_RIGHT, GESTURE_CENTER, GESTURE_RIGHT, GESTURE_CENTER, GESTURE_DOWN, GESTURE_CENTER
+		GESTURE_CENTER_IDLE, GESTURE_RIGHT, GESTURE_CENTER, GESTURE_RIGHT, GESTURE_CENTER, GESTURE_DOWN, GESTURE_CENTER
 };
 
 // D D D
 const uint8_t command3[GSIZE] = {
-	GESTURE_CENTER_IDLE, GESTURE_DOWN, GESTURE_CENTER, GESTURE_DOWN, GESTURE_CENTER, GESTURE_DOWN, GESTURE_CENTER
+		GESTURE_CENTER_IDLE, GESTURE_DOWN, GESTURE_CENTER, GESTURE_DOWN, GESTURE_CENTER, GESTURE_DOWN, GESTURE_CENTER
 };
 
 
 uint8_t check_command( uint8_t  buffer1[] , const uint8_t  command[]  )
 {
-    for (int i = 0; i < GSIZE; i++)
-            {
-                if( buffer1[i] != command[GSIZE - i - 1])
-                return 0;
-            }     
-return 1;            
+	for (int i = 0; i < GSIZE; i++)
+	{
+		if( buffer1[i] != command[GSIZE - i - 1])
+			return 0;
+	}
+	return 1;
 }
 
 int gesture_sequence(int currentgesture)
 {
 
 	if (currentgesture != gbuffer[0])
-	  {			// add to queue
+	{			// add to queue
 
-		  for (int i = GSIZE; i >= 1; i--)
-		    {
-			    gbuffer[i] = gbuffer[i - 1];
+		for (int i = GSIZE; i >= 1; i--)
+		{
+			gbuffer[i] = gbuffer[i - 1];
 
-		    }
-		  gbuffer[0] = currentgesture;
+		}
+		gbuffer[0] = currentgesture;
 
 
-// check commands
+		// check commands
 
-		  if (check_command ( &gbuffer[0] , &command1[0] ) )
-		    {
-			    // command 1
+		if (check_command ( &gbuffer[0] , &command1[0] ) )
+		{
+			// command 1
 
-			    //change buffer so it does not trigger again
-			    gbuffer[1] = GESTURE_OTHER;
-			    return 1;
-		    }
+			//change buffer so it does not trigger again
+			gbuffer[1] = GESTURE_OTHER;
+			return 1;
+		}
 
-		
-		  if (check_command ( &gbuffer[0] , &command2[0] ))
-		    {
-			    // command 2
 
-			    //change buffer so it does not trigger again
-			    gbuffer[1] = GESTURE_OTHER;
-			    return 2;
-		    }
+		if (check_command ( &gbuffer[0] , &command2[0] ))
+		{
+			// command 2
 
-		
-		  if (check_command ( &gbuffer[0] , &command3[0] ))
-		    {
-			    // command 3
+			//change buffer so it does not trigger again
+			gbuffer[1] = GESTURE_OTHER;
+			return 2;
+		}
 
-			    //change buffer so it does not trigger again
-			    gbuffer[1] = GESTURE_OTHER;
-			    return 3;
-		    }
 
-	  }
+		if (check_command ( &gbuffer[0] , &command3[0] ))
+		{
+			// command 3
+
+			//change buffer so it does not trigger again
+			gbuffer[1] = GESTURE_OTHER;
+			return 3;
+		}
+
+	}
 
 	return 0;
 }

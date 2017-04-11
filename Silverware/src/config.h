@@ -121,6 +121,10 @@
 
 #define LEVELMODE CH_AUX1
 
+#define ARM_SWITCH			DEVO_CHAN_8
+#define ACRO_MODE_SWITCH	DEVO_CHAN_5
+#define BEEP_MOTOR_BUTTON	DEVO_CHAN_6
+
 #define STARTFLIP CH_OFF
 
 #define LEDS_ON CH_ON
@@ -169,7 +173,7 @@
 //#define MOTOR_CURVE_85MM_32KHZ
 
 // lost quad beeps using motors (30 sec timeout)
-//#define MOTOR_BEEPS
+#define MOTOR_BEEPS
 
 // throttle angle compensation in level mode
 // comment out to disable
@@ -237,7 +241,7 @@
 #define TRIM_ROLL 0.0
 
 // disable motors for testing
-// #define NOMOTORS
+//#define NOMOTORS
 
 // throttle direct to motors for thrust measure
 // #define MOTORS_TO_THROTTLE
