@@ -627,22 +627,22 @@ int beepon = 0;
 #define MOTOR_BEEPS_TIMEOUT 30e6
 #endif
 
-#define MOTOR_BEEPS_PWM_ON 0.2
+#define MOTOR_BEEPS_PWM_ON 0.05
 #define MOTOR_BEEPS_PWM_OFF 0.0
 
 extern char aux[AUXNUMBER];
 
 void motorbeep( void)
 {
-	if (failsafe && aux[BEEP_MOTOR_BUTTON])
+	if (/*failsafe || */aux[BEEP_MOTOR_BUTTON])
 	{
 		unsigned long time = gettime();
 		if (!motorbeeptime)
 				motorbeeptime = time;
 		else
-			if ( time - motorbeeptime > MOTOR_BEEPS_TIMEOUT)
-			{
-				if (!beepon&&(time%2000000 < 125000))
+//			if ( time - motorbeeptime > MOTOR_BEEPS_TIMEOUT)
+//			{
+				if (!beepon&&(time%1000000 < 125000))
 				{
 				for ( int i = 0 ; i <= 3 ; i++)
 					{
@@ -660,7 +660,7 @@ void motorbeep( void)
 					
 				}
 				
-			}
+//			}
 	}
 	else
 		motorbeeptime = 0;
