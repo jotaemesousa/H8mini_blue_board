@@ -34,27 +34,27 @@ float angleerror[3];
 
 float apid(int x)
 {
- int index = x;
-	
+	int index = x;
+
 	if (onground)
-	  {
-		  aierror[x] *= 0.8f;
-	  }
+	{
+		aierror[x] *= 0.8f;
+	}
 	// anti windup
 	// prevent integral increase if output is at max
 	int iwindup = 0;
 	if ((apidoutput[x] == OUTLIMIT_FLOAT) && (gyro[index] > 0))
-	  {
-		  iwindup = 1;
-	  }
+	{
+		iwindup = 1;
+	}
 	if ((apidoutput[x] == -OUTLIMIT_FLOAT) && (gyro[index] < 0))
-	  {
-		  iwindup = 1;
-	  }
+	{
+		iwindup = 1;
+	}
 	if (!iwindup)
-	  {
-		  aierror[x] = aierror[x] + angleerror[index] * apidki[x] * looptime;
-	  }
+	{
+		aierror[x] = aierror[x] + angleerror[index] * apidki[x] * looptime;
+	}
 
 	limitf(&aierror[x], ITERMLIMIT_FLOAT);
 
@@ -71,4 +71,13 @@ float apid(int x)
 
 
 	return apidoutput[x];
+}
+
+void resetApidError(void)
+{
+	int var = 0;
+	for (var = 0; var < APIDNUMBER; ++var) {
+		apidoutput[var]= 0.0f;
+		aierror[var]=0.0f;
+	}
 }

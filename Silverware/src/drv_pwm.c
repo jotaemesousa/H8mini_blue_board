@@ -634,7 +634,7 @@ extern char aux[AUXNUMBER];
 
 void motorbeep( void)
 {
-	if (/*failsafe || */aux[BEEP_MOTOR_BUTTON])
+	if (failsafe)
 	{
 		unsigned long time = gettime();
 		if (!motorbeeptime)

@@ -65,6 +65,7 @@ extern char aux[AUXNUMBER];
 extern int ledcommand;
 
 extern float apid(int x);
+extern void resetApidError(void);
 
 #ifdef NOMOTORS
 // to maintain timing or it will be optimized away
@@ -89,6 +90,19 @@ float underthrottlefilt = 0;
 float rxcopy[4];
 
 int armed = 0;
+
+int isRollPitchYawGreaterThanTrsh()
+{
+	int i;
+	for (i = 0; i < 4; ++i) {
+		if(rx[i] > AIR_MODE_THROTLE_POSITION_THRESHOULD || rx[i] < -AIR_MODE_THROTLE_POSITION_THRESHOULD)
+		{
+			return 1;
+		}
+
+	}
+	return 0;
+}
 
 void control( void)
 {	
@@ -219,6 +233,55 @@ void control( void)
 #endif	
 	pid_precalc();
 
+
+	float	throttle;
+
+	if(armed == 0)
+	{
+		if(aux[ARM_SWITCH] && rx[3] < 0.1f)
+		{
+			armed = 1;
+		}
+	}
+	else
+	{
+		if(!aux[ARM_SWITCH])
+		{
+			armed = 0;
+		}
+	}
+
+	if(armed)
+	{
+		// map throttle so under 10% it is zero
+		if ( rx[3] < AIR_MODE_THROTLE_POSITION_THRESHOULD)
+		{
+			if(aux[AIR_MODE_SWITCH] && !(!aux[ACRO_MODE_SWITCH]&&!acro_override))
+			{
+				throttle = AIR_MODE_THROTLE_VALUE;
+			}
+			else
+			{
+				throttle = 0;
+			}
+		}
+		else
+		{
+			if(aux[AIR_MODE_SWITCH])
+			{
+				throttle = (rx[3])*1.0f;
+			}
+			else
+			{
+				throttle = (rx[3] - AIR_MODE_THROTLE_POSITION_THRESHOULD)*1.11111111f;
+			}
+		}
+	}
+	else
+	{
+		throttle = 0;
+	}
+
 #ifndef ACRO_ONLY
 	// dual mode build
 	if (!aux[ACRO_MODE_SWITCH]&&!acro_override)
@@ -246,6 +309,7 @@ void control( void)
 		}
 
 		error[2] = yawerror[2]  - gyro[2];
+
 	}
 	else
 	{	// rate mode
@@ -261,10 +325,37 @@ void control( void)
 			aierror[i] *= 0.8f;
 	}
 
-
-	pid(0);
-	pid(1);
-	pid(2);
+	if ((!aux[ACRO_MODE_SWITCH]&&!acro_override))
+	{
+		if ( rx[3] > AIR_MODE_THROTLE_POSITION_THRESHOULD)
+		{
+			pid(0);
+			pid(1);
+			pid(2);
+		}
+		else
+		{
+			if(aux[AIR_MODE_SWITCH])
+			{
+				resetPidsError();
+				resetApidError();
+			}
+		}
+	}
+	else
+	{
+		if(isRollPitchYawGreaterThanTrsh())
+		{
+			pid(0);
+			pid(1);
+			pid(2);
+		}
+		else
+		{
+			resetPidsError();
+			resetApidError();
+		}
+	}
 #else
 	// rate only build
 	error[ROLL] = rxcopy[ROLL] * (float) MAX_RATE * DEGTORAD  - gyro[ROLL];
@@ -277,26 +368,6 @@ void control( void)
 	pid(YAW);
 #endif
 
-	float	throttle;
-
-	if(armed == 0)
-	{
-		if(aux[ARM_SWITCH] && rx[3] < 0.1f)
-		{
-			armed = 1;
-		}
-	}
-	else
-	{
-		if(!aux[ARM_SWITCH])
-		{
-			armed = 0;
-		}
-	}
-
-	// map throttle so under 10% it is zero
-	if ( rx[3] < 0.1f || !armed) throttle = 0;
-	else throttle = (rx[3] - 0.1f)*1.11111111f;
 
 #ifdef AIRMODE_HOLD_SWITCH
 	if (failsafe || aux[AIRMODE_HOLD_SWITCH] || throttle < 0.001f && !onground_long)
@@ -408,10 +479,31 @@ void control( void)
 			pidoutput[2] = -pidoutput[2];
 #endif
 
+			//			if(aux[AIR_MODE_SWITCH])
+			//			{
+			//				if(throttle <= AIR_MODE_THROTLE_VALUE)
+			//				{
+			//					mix[MOTOR_FR] = throttle;		// FR
+			//					mix[MOTOR_FL] = throttle;		// FL
+			//					mix[MOTOR_BR] = throttle;		// BR
+			//					mix[MOTOR_BL] = throttle;		// BL
+			//				}
+			//				else
+			//				{
+			//					mix[MOTOR_FR] = throttle - pidoutput[ROLL] - pidoutput[PITCH] + pidoutput[YAW];		// FR
+			//					mix[MOTOR_FL] = throttle + pidoutput[ROLL] - pidoutput[PITCH] - pidoutput[YAW];		// FL
+			//					mix[MOTOR_BR] = throttle - pidoutput[ROLL] + pidoutput[PITCH] - pidoutput[YAW];		// BR
+			//					mix[MOTOR_BL] = throttle + pidoutput[ROLL] + pidoutput[PITCH] + pidoutput[YAW];		// BL
+			//				}
+			//			}
+			//			else
+			//			{
+
 			mix[MOTOR_FR] = throttle - pidoutput[ROLL] - pidoutput[PITCH] + pidoutput[YAW];		// FR
 			mix[MOTOR_FL] = throttle + pidoutput[ROLL] - pidoutput[PITCH] - pidoutput[YAW];		// FL
 			mix[MOTOR_BR] = throttle - pidoutput[ROLL] + pidoutput[PITCH] - pidoutput[YAW];		// BR
 			mix[MOTOR_BL] = throttle + pidoutput[ROLL] + pidoutput[PITCH] + pidoutput[YAW];		// BL
+			//			}
 
 #ifdef INVERT_YAW_PID
 			// we invert again cause it's used by the pid internally (for limit)

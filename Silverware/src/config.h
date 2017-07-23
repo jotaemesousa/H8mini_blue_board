@@ -123,11 +123,15 @@
 
 #define ARM_SWITCH			DEVO_CHAN_8
 #define ACRO_MODE_SWITCH	DEVO_CHAN_5
-#define BEEP_MOTOR_BUTTON	DEVO_CHAN_6
+#define AIR_MODE_SWITCH		DEVO_CHAN_6
 
 #define STARTFLIP CH_OFF
 
 #define LEDS_ON CH_ON
+
+#define AIR_MODE_THROTLE_VALUE						0.05f
+#define AIR_MODE_THROTLE_POSITION_THRESHOULD		0.1f
+
 
 // switch for fpv / other, requires fet
 // comment out to disable
@@ -135,7 +139,7 @@
 
 // Airmode keeps the PID loop stabilizing the quads orientation even at zero throttle.
 // To stop the motors on ground a switch on the remote control is necessary.
-//#define AIRMODE_HOLD_SWITCH CH_INV // DEVO_CHAN_5
+//#define AIRMODE_HOLD_SWITCH DEVO_CHAN_7
 
 
 // aux1 channel starts on if this is defined, otherwise off.
@@ -173,7 +177,7 @@
 //#define MOTOR_CURVE_85MM_32KHZ
 
 // lost quad beeps using motors (30 sec timeout)
-#define MOTOR_BEEPS
+//#define MOTOR_BEEPS
 
 // throttle angle compensation in level mode
 // comment out to disable
