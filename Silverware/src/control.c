@@ -89,8 +89,6 @@ float underthrottlefilt = 0;
 
 float rxcopy[4];
 
-int armed = 0;
-
 int isRollPitchYawGreaterThanTrsh()
 {
 	int i;
@@ -234,52 +232,17 @@ void control( void)
 	pid_precalc();
 
 
-	float	throttle;
-
-	if(armed == 0)
-	{
-		if(aux[ARM_SWITCH] && rx[3] < 0.1f)
-		{
-			armed = 1;
-		}
-	}
-	else
-	{
-		if(!aux[ARM_SWITCH])
-		{
-			armed = 0;
-		}
-	}
-
-	if(armed)
-	{
-		// map throttle so under 10% it is zero
-		if ( rx[3] < AIR_MODE_THROTLE_POSITION_THRESHOULD)
-		{
-			if(aux[AIR_MODE_SWITCH] && !(!aux[ACRO_MODE_SWITCH]&&!acro_override))
-			{
-				throttle = AIR_MODE_THROTLE_VALUE;
-			}
-			else
-			{
-				throttle = 0;
-			}
-		}
-		else
-		{
-			if(aux[AIR_MODE_SWITCH])
-			{
-				throttle = (rx[3])*1.0f;
-			}
-			else
-			{
-				throttle = (rx[3] - AIR_MODE_THROTLE_POSITION_THRESHOULD)*1.11111111f;
-			}
-		}
-	}
-	else
+	float	throttle, lift;
+	// map throttle so under 10% it is zero
+	if ( rx[3] < AIR_MODE_THROTLE_POSITION_THRESHOULD && rx[1] < AIR_MODE_THROTLE_POSITION_THRESHOULD)
 	{
 		throttle = 0;
+		lift = 0;
+	}
+	else
+	{
+		throttle = ((rx[1])>0?rx[1]:-rx[1])*1.0f;
+		lift = (rx[3])*1.0f;
 	}
 
 #ifndef ACRO_ONLY
@@ -325,9 +288,9 @@ void control( void)
 			aierror[i] *= 0.8f;
 	}
 
-	if ((!aux[ACRO_MODE_SWITCH]&&!acro_override))
+	if (!acro_override)
 	{
-		if ( rx[3] > AIR_MODE_THROTLE_POSITION_THRESHOULD)
+		if ( rx[1] > AIR_MODE_THROTLE_POSITION_THRESHOULD)
 		{
 			pid(0);
 			pid(1);
@@ -340,20 +303,6 @@ void control( void)
 				resetPidsError();
 				resetApidError();
 			}
-		}
-	}
-	else
-	{
-		if(isRollPitchYawGreaterThanTrsh())
-		{
-			pid(0);
-			pid(1);
-			pid(2);
-		}
-		else
-		{
-			resetPidsError();
-			resetApidError();
 		}
 	}
 #else
@@ -499,10 +448,10 @@ void control( void)
 			//			else
 			//			{
 
-			mix[MOTOR_FR] = throttle - pidoutput[ROLL] - pidoutput[PITCH] + pidoutput[YAW];		// FR
-			mix[MOTOR_FL] = throttle + pidoutput[ROLL] - pidoutput[PITCH] - pidoutput[YAW];		// FL
-			mix[MOTOR_BR] = throttle - pidoutput[ROLL] + pidoutput[PITCH] - pidoutput[YAW];		// BR
-			mix[MOTOR_BL] = throttle + pidoutput[ROLL] + pidoutput[PITCH] + pidoutput[YAW];		// BL
+			mix[MOTOR_FR] = lift;		// FR
+			mix[MOTOR_FL] = lift;		// FL
+			mix[MOTOR_BR] = throttle - rx[2];		// BR
+			mix[MOTOR_BL] = throttle + rx[2];		// BL
 			//			}
 
 #ifdef INVERT_YAW_PID

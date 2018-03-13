@@ -352,9 +352,9 @@ static int decodepacket(void)
 		}
 		if ((sum & 0xFF) == rxdata[14])
 		{
-			rx[0] = packettodata(&rxdata[4]);
+			rx[2] = packettodata(&rxdata[4]);
 			rx[1] = packettodata(&rxdata[6]);
-			rx[2] = packettodata(&rxdata[10]);
+			rx[0] = packettodata(&rxdata[10]);
 			// throttle
 			rx[3] =
 					((rxdata[8] & 0x0003) * 256 +

@@ -6,8 +6,8 @@
 
 // rate in deg/sec
 // for acro mode
-#define MAX_RATE 360.0
-#define MAX_RATEYAW 360.0
+#define MAX_RATE 680.0
+#define MAX_RATEYAW 680.0
 
 // max angle for level mode
 #define MAX_ANGLE_HI 55.0f
@@ -15,14 +15,14 @@
 #define LOW_RATES_MULTI 0.5f
 
 // disable inbuilt expo functions
-#define DISABLE_EXPO
+//#define DISABLE_EXPO
 
 // use if your tx has no expo function
 // also comment out DISABLE_EXPO to use
 // -1 to 1 , 0 = no exp
 // positive = less sensitive near center 
-#define EXPO_XY 0.3
-#define EXPO_YAW 0.0
+#define EXPO_XY 0.5
+#define EXPO_YAW 0.5
 
 
 
